@@ -63,7 +63,7 @@ pipeline {
             echo 'AMI built successfully'
         }
 
-        failed {
+        failure {
             echo 'AMI  failed'
         }
     }
