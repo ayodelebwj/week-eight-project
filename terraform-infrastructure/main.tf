@@ -134,7 +134,7 @@ resource "aws_instance" "java_instance" {
   security_groups = [aws_security_group.java_sg.name]
 
   tags = {
-    Name = "java-Instance"
+    Name = "java-instance"
   }
 }
 
@@ -146,7 +146,7 @@ resource "aws_instance" "python_instance" {
   security_groups = [aws_security_group.python_sg.name]
 
   tags = {
-    Name = "python-Instance"
+    Name = "python-instance"
   }
 }
 
@@ -158,6 +158,6 @@ resource "aws_instance" "web_instance" {
   security_groups = [aws_security_group.web_sg.name]
 
   tags = {
-    Name = "web-Instance"
+    Name = "web-instance"
   }
 }

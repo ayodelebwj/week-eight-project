@@ -5,6 +5,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials ('aws-access-key-id')
         AWS_SECRET_ACCESS_KEY = credentials ('aws-secret-access-key')
         AWS_DEFAULT_REGION = 'us-east-2'
+        TARGET_MACHINE_PRIVATE_IP = ''
     }
 
     parameters {
@@ -36,6 +37,45 @@ pipeline {
                 git clone https://github.com/techbleat/fruits-veg_market.git ;
                 cd ~/fruits-veg_market/web ;
                 JAVA_INSTANCE_PUBLIC_IP=\\$(aws ec2 describe-instances --filters "Name=tag:Name,Values=java-instance" \
+                --query "Reservations[0].Instances[0].PublicIpAddress" \
+                --output text);
+                sed -i "s|http://VEG_MACHINE:8080|http://"$JAVA_INSTANCE_PUBLIC_IP":8080|g" index.html;
+                PYTHON_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=python-instance" \
+                --query "Reservations[0].Instances[0].PublicIpAddress" \
+                --output text);
+                sed -i "s|http://localhostFRUIT_MACHINE:9000|http://${PYTHON_INSTANCE_PUBLIC_IP}:9000|g" index.html;
+
+                sudo cp ~/fruits-veg_market/web/index.html /var/www/html/index.html'
+                '''
+                 }
+            }
+        }
+
+
+
+        stage ('Deploy Web App Nginx') {
+        when {
+            expression {params.TF_ACTION == 'WEB APP NGINX'}
+        }
+            steps {
+                 sshagent (credentials: ['AWS-SSH-KEY']) {
+                sh '''
+                target-machine-private-ip=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=web-instance" \
+                --query "Reservations[0].Instances[0].PrivateIpAddress" \
+                --output text);
+                env.TARGET_MACHINE_PRIVATE_IP = ${target-machine-private-ip};
+                ssh -o StrictHostKeyChecking=no ubuntu@${env.TARGET_MACHINE_PRIVATE_IP} 'cd ~ ;
+                export ${env.AWS_ACCESS_KEY_ID}
+                export ${env.AWS_SECRET_ACCESS_KEY}
+                export ${env.AWS_DEFAULT_REGION}
+                sudo apt install nginx -y ; 
+                sudo systemctl daemon-reload ;
+                sudo systemctl enable nginx ;
+                sudo systemctl start nginx ;
+                sudo rm -rf fruits-veg_market ;
+                git clone https://github.com/techbleat/fruits-veg_market.git ;
+                cd ~/fruits-veg_market/web ;
+                JAVA_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=java-instance" \
                 --query "Reservations[0].Instances[0].PublicIpAddress" \
                 --output text);
                 sed -i "s|http://VEG_MACHINE:8080|http://"$JAVA_INSTANCE_PUBLIC_IP":8080|g" index.html;
