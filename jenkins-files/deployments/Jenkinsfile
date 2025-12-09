@@ -25,9 +25,7 @@ pipeline {
                 sh '''
                 WEB_INSTANCE_PRIVATE_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=web-instance" \
                 --query "Reservations[0].Instances[0].PrivateIpAddress" \
-                --output text);
-
-               
+                --output text)
 
                 ssh -o StrictHostKeyChecking=no ubuntu@$WEB_INSTANCE_PRIVATE_IP << EOF
                 cd ~ 
@@ -46,8 +44,8 @@ pipeline {
                 cd ~
                 git clone https://github.com/techbleat/fruits-veg_market.git 
                 cd ~/fruits-veg_market/web 
-                sed -i "s|http://VEG_MACHINE:8080|http://$JAVA_INSTANCE_PUBLIC_IP:8080|g" index.html
-                sed -i "s|http://FRUIT_MACHINE:9000|http://$PYTHON_INSTANCE_PUBLIC_IP:9000|g" index.html
+                sed -i "s|http://VEG_MACHINE:8080|http://${JAVA_INSTANCE_PUBLIC_IP}:8080|g" index.html
+                sed -i "s|http://FRUIT_MACHINE:9000|http://${PYTHON_INSTANCE_PUBLIC_IP}:9000|g" index.html
                 sudo cp ~/fruits-veg_market/web/index.html /var/www/html/index.html
                 '''
                  }
