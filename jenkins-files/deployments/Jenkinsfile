@@ -26,21 +26,23 @@ pipeline {
                 WEB_INSTANCE_PRIVATE_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=web-instance" \
                 --query "Reservations[0].Instances[0].PrivateIpAddress" \
                 --output text);
-                ssh -o StrictHostKeyChecking=no ubuntu@$WEB_INSTANCE_PRIVATE_IP 'cd ~ ;
-                export ${env.AWS_ACCESS_KEY_ID};
-                export ${env.AWS_SECRET_ACCESS_KEY};
-                export ${env.AWS_DEFAULT_REGION};
-                sudo apt install nginx -y ; 
-                sudo systemctl daemon-reload ;
-                sudo systemctl enable nginx ;
-                sudo systemctl start nginx ;
-                sudo rm -rf fruits-veg_market ;
-                cd ~;
-                git clone https://github.com/techbleat/fruits-veg_market.git ;
-                cd ~/fruits-veg_market/web ;
-                sed -i "s|http://VEG_MACHINE:8080|http://${env.JAVA_INSTANCE_PUBLIC_IP}:8080|g" index.html;
-                sed -i "s|http://FRUIT_MACHINE:9000|http://${env.PYTHON_INSTANCE_PUBLIC_IP}:9000|g" index.html;
-                sudo cp ~/fruits-veg_market/web/index.html /var/www/html/index.html'
+                ssh -o StrictHostKeyChecking=no ubuntu@$WEB_INSTANCE_PRIVATE_IP << 'EOF'
+                cd ~ 
+                export ${env.AWS_ACCESS_KEY_ID}
+                export ${env.AWS_SECRET_ACCESS_KEY}
+                export ${env.AWS_DEFAULT_REGION}
+                sudo apt install nginx -y 
+                sudo systemctl daemon-reload 
+                sudo systemctl enable nginx 
+                sudo systemctl start nginx 
+                sudo rm -rf fruits-veg_market 
+                cd ~
+                git clone https://github.com/techbleat/fruits-veg_market.git 
+                cd ~/fruits-veg_market/web 
+                sed -i "s|http://VEG_MACHINE:8080|http://${env.JAVA_INSTANCE_PUBLIC_IP}:8080|g" index.html
+                sed -i "s|http://FRUIT_MACHINE:9000|http://${env.PYTHON_INSTANCE_PUBLIC_IP}:9000|g" index.html
+                sudo cp ~/fruits-veg_market/web/index.html /var/www/html/index.html
+                EOF
                 '''
                  }
             }
@@ -56,15 +58,17 @@ pipeline {
                 JAVA_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=java-instance" \
                 --query "Reservations[0].Instances[0].PublicIpAddress" \
                 --output text);
-                ssh -o StrictHostKeyChecking=no ubuntu@$JAVA_INSTANCE_PUBLIC_IP 
-                'sudo cp vegetables.service /etc/systemd/system/vegetables.service;
-                cd ~ ;
-                sudo rm -rf fruits-veg_market ;
-                cd ~;
-                git clone https://github.com/techbleat/fruits-veg_market.git ;
-                sudo systemctl daemon-reload ;
-                sudo systemctl enable vegetables.service ;
+
+                ssh -o StrictHostKeyChecking=no ubuntu@$JAVA_INSTANCE_PUBLIC_IP << 'EOF'
+                sudo cp vegetables.service /etc/systemd/system/vegetables.service
+                cd ~ 
+                sudo rm -rf fruits-veg_market 
+                cd ~
+                git clone https://github.com/techbleat/fruits-veg_market.git 
+                sudo systemctl daemon-reload 
+                sudo systemctl enable vegetables.service 
                 sudo systemctl restart vegetables.service 
+                EOF
                 '''
                  }
             }
@@ -81,18 +85,20 @@ pipeline {
                  PYTHON_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=python-instance" \
                 --query "Reservations[0].Instances[0].PublicIpAddress" \
                 --output text);
-                ssh -o StrictHostKeyChecking=no ubuntu@$PYTHON_INSTANCE_PUBLIC_IP 
-                'sudo cp fruits.service /etc/systemd/system/fruits.service;
-                cd ~ ;
-                sudo rm -rf fruits-veg_market ;
-                git clone https://github.com/techbleat/fruits-veg_market.git ;
-                cd ~/fruits-veg_market/python;
-                python3 -m venv .venv;
-                source .venv/bin/activate;
-                python -m pip install -r requirements.txt;
-                sudo systemctl daemon-reload ;
-                sudo systemctl enable fruits.service ;
+
+                ssh -o StrictHostKeyChecking=no ubuntu@$PYTHON_INSTANCE_PUBLIC_IP << 'EOF'
+                sudo cp fruits.service /etc/systemd/system/fruits.service
+                cd ~ 
+                sudo rm -rf fruits-veg_market 
+                git clone https://github.com/techbleat/fruits-veg_market.git 
+                cd ~/fruits-veg_market/python
+                python3 -m venv .venv
+                source .venv/bin/activate
+                python -m pip install -r requirements.txt
+                sudo systemctl daemon-reload 
+                sudo systemctl enable fruits.service 
                 sudo systemctl restart fruits.service 
+                EOF
                 '''
                  }
             }
