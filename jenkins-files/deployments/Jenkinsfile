@@ -26,11 +26,20 @@ pipeline {
                 WEB_INSTANCE_PRIVATE_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=web-instance" \
                 --query "Reservations[0].Instances[0].PrivateIpAddress" \
                 --output text);
-                ssh -o StrictHostKeyChecking=no ubuntu@$WEB_INSTANCE_PRIVATE_IP << 'EOF'
+
+               
+
+                ssh -o StrictHostKeyChecking=no ubuntu@$WEB_INSTANCE_PRIVATE_IP << EOF
                 cd ~ 
                 export ${env.AWS_ACCESS_KEY_ID}
                 export ${env.AWS_SECRET_ACCESS_KEY}
                 export ${env.AWS_DEFAULT_REGION}
+                 JAVA_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=java-instance" \
+                --query "Reservations[0].Instances[0].PublicIpAddress" \
+                --output text)
+                PYTHON_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=python-instance" \
+                --query "Reservations[0].Instances[0].PublicIpAddress" \
+                --output text)
                 sudo apt install nginx -y 
                 sudo systemctl daemon-reload 
                 sudo systemctl enable nginx 
@@ -42,7 +51,6 @@ pipeline {
                 sed -i "s|http://VEG_MACHINE:8080|http://${env.JAVA_INSTANCE_PUBLIC_IP}:8080|g" index.html
                 sed -i "s|http://FRUIT_MACHINE:9000|http://${env.PYTHON_INSTANCE_PUBLIC_IP}:9000|g" index.html
                 sudo cp ~/fruits-veg_market/web/index.html /var/www/html/index.html
-                EOF
                 '''
                  }
             }
