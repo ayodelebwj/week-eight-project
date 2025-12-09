@@ -10,7 +10,7 @@ pipeline {
     parameters {
         choice (
         name: 'DEPLOYMENT',
-        choices: ['WEB APP NGINX', 'JAVA APP', 'PYTHON APP'],
+        choices: ['WEB_APP_NGINX', 'JAVA_APP', 'PYTHON_APP'],
         description: 'Select App To Deploy'
     )
 
@@ -25,6 +25,9 @@ pipeline {
                  sshagent (credentials: ['AWS-SSH-KEY']) {
                 sh '''
                 ssh -o StrictHostKeyChecking=no ubuntu@123.456.789.10 'cd ~ ;
+                export ${env.AWS_ACCESS_KEY_ID}
+                export ${env.AWS_SECRET_ACCESS_KEY}
+                export ${env.AWS_DEFAULT_REGION}
                 sudo apt install nginx -y ; 
                 sudo systemctl daemon-reload ;
                 sudo systemctl enable nginx ;
