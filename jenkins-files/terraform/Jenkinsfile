@@ -9,11 +9,11 @@ pipeline {
 
     parameters {
 
-        choice {
+        choice (
             name: 'TERRAFORM_ACTION',
             choices: ['PLAN', 'APPLY', 'DESTROY'],
             description: 'Choose Action To Perform'
-        }
+        )
     }
 
     stages {

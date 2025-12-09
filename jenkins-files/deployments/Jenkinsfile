@@ -8,11 +8,11 @@ pipeline {
     }
 
     parameters {
-        choice {
+        choice (
         name: 'DEPLOYMENT',
         choices: ['WEB APP NGINX', 'JAVA APP', 'PYTHON APP'],
         description: 'Select App To Deploy'
-    }
+    )
 
     }
 
@@ -98,7 +98,7 @@ pipeline {
             echo 'App deployed successfully'
         }
 
-        failed {
+        failure {
             echo 'App deployedment failed'
         }
     }
