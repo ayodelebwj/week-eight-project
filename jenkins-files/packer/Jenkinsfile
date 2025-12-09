@@ -51,10 +51,12 @@ pipeline {
             expression {params.TF_ACTION == 'PYTHON_AMI'}
         }
             steps {
+                dir ('packer-ami') {
                  sh 'ls -ltr'
                  sh 'packer fmt .'
                  sh 'packer validate .'
                  sh 'packer build python.pkr.hcl'
+                }
             }
 
         }
