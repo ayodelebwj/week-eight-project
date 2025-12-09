@@ -60,7 +60,7 @@ pipeline {
                 --output text);
 
                 ls -ltr $WORKSPACE
-                scp $WORKSPACE/vegetables.service ubuntu@$JAVA_INSTANCE_PUBLIC_IP:/etc/systemd/system/vegetables.service
+                scp $WORKSPACE/jenkins-files/deployments/vegetables.service ubuntu@$JAVA_INSTANCE_PUBLIC_IP:/etc/systemd/system/vegetables.service
 
 
                 ssh -o StrictHostKeyChecking=no ubuntu@$JAVA_INSTANCE_PUBLIC_IP << 'EOF'
