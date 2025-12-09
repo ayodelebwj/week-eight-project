@@ -10,7 +10,7 @@ pipeline {
     parameters {
 
         choice (
-            name: 'TERRAFORM_ACTION',
+            name: 'TF_ACTION',
             choices: ['PLAN', 'APPLY', 'DESTROY'],
             description: 'Choose Action To Perform'
         )
@@ -22,10 +22,12 @@ pipeline {
             expression {params.TF_ACTION == 'PLAN'}
         }    
             steps {
+                dir ('terraform-infrastructure') {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
                 sh 'terraform plan'
+                }
             }
         }
 
@@ -34,10 +36,26 @@ pipeline {
             expression {params.TF_ACTION == 'APPLY'}
         }    
             steps {
+                dir ('terraform-infrastructure') {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
-                sh 'terraform apply -var-file values.tfvars --auto-approve'
+                sh 'terraform apply --auto-approve'
+                }
+            }
+        }
+
+        stage ('Terraform Destroy') {
+        when {
+            expression {params.TF_ACTION == 'DESTROY'}
+        }    
+            steps {
+                dir ('terraform-infrastructure') {
+                sh 'terraform init'
+                sh 'terraform fmt'
+                sh 'terraform validate'
+                sh 'terraform destroy --auto-approve'
+                }
             }
         }
     }
