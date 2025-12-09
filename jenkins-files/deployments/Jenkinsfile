@@ -65,6 +65,7 @@ pipeline {
                 sudo rm -rf fruits-veg_market 
                 cd ~
                 git clone https://github.com/techbleat/fruits-veg_market.git 
+                ls -ltr
                 sudo systemctl daemon-reload 
                 sudo systemctl enable vegetables.service 
                 sudo systemctl restart vegetables.service 
