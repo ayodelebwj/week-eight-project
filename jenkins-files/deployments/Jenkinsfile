@@ -88,8 +88,10 @@ pipeline {
                 --query "Reservations[0].Instances[0].PublicIpAddress" \
                 --output text);
 
-                ssh -o StrictHostKeyChecking=no ubuntu@$PYTHON_INSTANCE_PUBLIC_IP << 'EOF'
-                sudo cp fruits.service /etc/systemd/system/fruits.service
+                scp $WORKSPACE/jenkins-files/deployments/fruits.service ubuntu@$PYTHON_INSTANCE_PUBLIC_IP:/tmp
+
+                ssh -o StrictHostKeyChecking=no ubuntu@$PYTHON_INSTANCE_PUBLIC_IP << EOF
+                sudo cp /tmp/fruits.service /etc/systemd/system/fruits.service
                 cd ~ 
                 sudo rm -rf fruits-veg_market 
                 git clone https://github.com/techbleat/fruits-veg_market.git 
@@ -99,8 +101,7 @@ pipeline {
                 python -m pip install -r requirements.txt
                 sudo systemctl daemon-reload 
                 sudo systemctl enable fruits.service 
-                sudo systemctl restart fruits.service 
-                EOF
+                sudo systemctl start fruits.service 
                 '''
                  }
             }
