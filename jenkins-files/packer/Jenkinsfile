@@ -16,6 +16,7 @@ pipeline {
 
     }
 
+    // This stage builds the nginx web server AMI using Packer 
     stages {
         stage ('Create Web AMI') {
         when {
@@ -33,6 +34,8 @@ pipeline {
 
         }
 
+        // This stage builds the java app AMI using Packer 
+
         stage ('Create Java AMI') {
         when {
             expression {params.TF_ACTION == 'JAVA_AMI'}
@@ -48,6 +51,7 @@ pipeline {
             }
         }
 
+        // This stage builds the python app AMI using Packer 
         stage ('Create Python AMI') {
         when {
             expression {params.TF_ACTION == 'PYTHON_AMI'}

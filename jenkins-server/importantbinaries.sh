@@ -1,9 +1,6 @@
- 
- 
- 
- 
- 
- #!/bin/bash
+#!/bin/bash
+
+# THIS INSTALLS IMPOTANT BINARIES NEEDE BY JENKINS TO PERFORM NEEDED TASK
 #=========================================================================
 # INSTALL GIT
 #=========================================================================
@@ -46,7 +43,9 @@ sudo systemctl enable jenkins
 sudo systemctl start jenkins
  
  
- # Install AWS CLI and Unzip
+#=========================================================================
+# INSTALL AWS CLI AND UNZIP
+#=========================================================================
 sudo apt install unzip -y
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip

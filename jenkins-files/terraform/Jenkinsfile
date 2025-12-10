@@ -17,6 +17,8 @@ pipeline {
     }
 
     stages {
+        // This stage applies the terraform plan command to see 
+        // changes to be made to the infrstructure 
         stage ('Terraform Plan') {
         when {
             expression {params.TF_ACTION == 'PLAN'}
@@ -26,11 +28,13 @@ pipeline {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
-                sh 'terraform plan'
+                sh 'terraform plan -var-file="values.tfvars"'
                 }
             }
         }
 
+        // This stage applies the terraform apply command to the 
+        // configuration file to build the infrastructure
         stage ('Terraform Apply') {
         when {
             expression {params.TF_ACTION == 'APPLY'}
@@ -40,11 +44,13 @@ pipeline {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
-                sh 'terraform apply --auto-approve'
+                sh 'terraform apply -var-file="values.tfvars" --auto-approve'
                 }
             }
         }
 
+        // This stage applies the terraform destroy command to the 
+        // configuration file to destroy the built infrastructure
         stage ('Terraform Destroy') {
         when {
             expression {params.TF_ACTION == 'DESTROY'}

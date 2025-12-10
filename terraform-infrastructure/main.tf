@@ -10,12 +10,12 @@ terraform {
 
 # Configure the AWS provider
 provider "aws" {
-  region = "us-east-2" 
+  region = var.region
 }
 
 # Java Security group  
 resource "aws_security_group" "java_sg" {
-  name        = "java-sg"
+  name        = var.java_machine_security_group_name
   description = "Allow SSH and HTTP"
 
   ingress {
@@ -23,28 +23,28 @@ resource "aws_security_group" "java_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   ingress {
     description = "JAVA PORT"
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = var.java_machine_ingress_port
+    to_port     = var.java_machine_ingress_port
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 }
 
 # Python Security Group
 resource "aws_security_group" "python_sg" {
-  name        = "python-sg"
+  name        = var.python_machine_security_group_name
   description = "Allow SSH and HTTP"
 
   ingress {
@@ -52,27 +52,27 @@ resource "aws_security_group" "python_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   ingress {
     description = "PYTHON PORT"
-    from_port   = 9000
-    to_port     = 9000
+    from_port   = var.python_machine_ingress_port
+    to_port     = var.python_machine_ingress_port
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 }
 
 resource "aws_security_group" "web_sg" {
-  name        = "web-sg"
+  name        = var.web_machine_security_group_name
   description = "Allow SSH and HTTP"
 
   ingress {
@@ -80,7 +80,7 @@ resource "aws_security_group" "web_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   ingress {
@@ -88,14 +88,14 @@ resource "aws_security_group" "web_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.security_group_cidr_block]
   }
 }
 
@@ -129,35 +129,36 @@ data "aws_ami" "web-ami" {
 # CREATE Java instance
 resource "aws_instance" "java_instance" {
   ami             = data.aws_ami.java-ami.id
-  instance_type   = "t3.micro"              
-  key_name        = "ohio-kp"               
+  instance_type   = var.java_machine_instance_type             
+  key_name        = var.java_machine_key_name             
   security_groups = [aws_security_group.java_sg.name]
 
   tags = {
-    Name = "java-instance"
+    Name = var.java_machine_key_name
   }
 }
 
 # CREATE Python instance
 resource "aws_instance" "python_instance" {
   ami             = data.aws_ami.python-ami.id
-  instance_type   = "t3.micro"              
-  key_name        = "ohio-kp"               
+  instance_type   = var.python_machine_instance_type           
+  key_name        = var.python_machine_key_name           
   security_groups = [aws_security_group.python_sg.name]
 
   tags = {
-    Name = "python-instance"
+    Name = var.python_machine_tag_name
   }
 }
 
 # CREATE Web instance
 resource "aws_instance" "web_instance" {
   ami             = data.aws_ami.web-ami.id
-  instance_type   = "t3.micro"              
-  key_name        = "ohio-kp"               
+  instance_type   = var.web_machine_instance_type             
+  key_name        = var.web_machine_key_name             
   security_groups = [aws_security_group.web_sg.name]
 
   tags = {
-    Name = "web-instance"
+    Name = var.web_machine_tag_name
   }
 }
+

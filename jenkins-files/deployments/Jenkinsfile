@@ -20,6 +20,8 @@ pipeline {
         when {
             expression {params.TF_ACTION == 'DEPLOY_NGINX_WEB_APP'}
         }
+            // This step fetches web server private ip installs and starts nginx fetches public ips
+            // of java and python app servers and sed command it into index.html file      
             steps {
                  sshagent (credentials: ['AWS-SSH-KEY']) {
                 sh '''
@@ -56,6 +58,8 @@ pipeline {
         when {
             expression {params.TF_ACTION == 'DEPLOY_JAVA_APP'}
         }
+            // This step fetches java app server public ip, ssh into it and copy java service 
+            // file into it, it then clones the repo and starts the java app server    
             steps {
                  sshagent (credentials: ['AWS-SSH-KEY']) {
                 sh '''
@@ -65,7 +69,6 @@ pipeline {
 
                 scp $WORKSPACE/jenkins-files/deployments/vegetables.service  ubuntu@$JAVA_INSTANCE_PUBLIC_IP:/tmp
                 
-
                 ssh -o StrictHostKeyChecking=no ubuntu@$JAVA_INSTANCE_PUBLIC_IP << EOF
                 cd ~
                 sudo rm -rf fruits-veg_market
@@ -80,6 +83,9 @@ pipeline {
 
         }
 
+        // This stage fetches python app server public ip, ssh into it, copies python service 
+        // file into it and activate important binaries. it then clones the repo and starts 
+        // the python app server    
         stage ('Deploy Python App') {
         when {
             expression {params.TF_ACTION == 'DEPLOY_PYTHON_APP'}
