@@ -28,7 +28,7 @@ pipeline {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
-                sh 'terraform plan -var-file="values.tfvars"'
+                sh 'terraform plan -var-file="dev.tfvars"'
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
                 sh 'terraform init'
                 sh 'terraform fmt'
                 sh 'terraform validate'
-                sh 'terraform apply -var-file="values.tfvars" --auto-approve'
+                sh 'terraform apply -var-file="dev.tfvars" --auto-approve'
                 }
             }
         }
