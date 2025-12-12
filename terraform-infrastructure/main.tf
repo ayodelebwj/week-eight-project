@@ -134,7 +134,7 @@ resource "aws_instance" "java_instance" {
   security_groups = [aws_security_group.java_sg.name]
 
   tags = {
-    Name = var.java_machine_key_name
+    Name = var.java_machine_tag_name
   }
 }
 
